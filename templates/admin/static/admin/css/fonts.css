@@ -1,0 +1,32 @@
+@font-face {
+    font-family: 'IRANSansX';
+    font-weight: normal;
+    src: local('IranSans'),
+    url('../fonts/iransansweb.ttf') format('ttf'),
+    url('../fonts/iransansweb.woff') format('woff'),
+    url('../fonts/IRANSansWeb.eot') format('eot'),
+    url('../fonts/iransansweb.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: "IRANSansX";
+    font-weight: bold;
+    src: local('IranSans'),
+    url("../fonts/IRANSans_Bold.ttf") format("ttf"),
+    url("../fonts/IRANSansXFaNum-Bold.woff") format("woff")
+}
+
+@font-face {
+    font-family: Yekan;
+    src: url("../fonts/IRANYekanX-Regular.woff") format("woff");
+    font-feature-settings: "ss02";
+
+}
+
+@font-face {
+    font-family: 'IRNazanin';
+    font-weight: normal;
+    src: local('IRNazanin'),
+    url("../fonts/IRNazanin.ttf") format("ttf")
+
+}
