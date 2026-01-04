@@ -19,7 +19,6 @@ class JudicialGeometryResource(resources.ModelResource):
 
     class Meta:
         model = JudicialGeometry
-        import_id_fields = ("code",)
         skip_unchanged = False
         report_skipped = True
         fields = (
@@ -47,6 +46,13 @@ class JudicialGeometryResource(resources.ModelResource):
         return super().get_queryset().select_related("judicial")
 
     @cached_property
+    def geometry_by_code(self):
+        return {
+            str(obj.code): obj
+            for obj in JudicialGeometry.objects.only("id", "code", "judicial_id")
+        }
+
+    @cached_property
     def judicial_map(self):
         return {ja.code: ja.id for ja in JudicialAuthority.objects.only("id", "code")}
 
@@ -62,8 +68,18 @@ class JudicialGeometryResource(resources.ModelResource):
             )
 
         code = row.get("code")
-        if code:
+        if code in ("", None):
+            row["code"] = None
+        else:
             row["code"] = str(int(float(code)))
+
+    def get_instance(self, instance_loader, row):
+        code = row.get("code")
+        if not code:
+            return None
+
+        return self.geometry_by_code.get(str(code))
+
 
     def before_save_instance(self, instance, row, **kwargs):
         instance.judicial_id = self.judicial_map[row["judicial_code"]]

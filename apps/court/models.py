@@ -59,7 +59,7 @@ class JudicialGeometry(models.Model):
         if not self.code:
             with transaction.atomic():
                 last_code = (
-                    JudicialAuthority.objects.select_for_update()
+                    JudicialGeometry.objects.select_for_update()
                     .aggregate(max_code=Max("code"))
                     .get("max_code")
                 )
