@@ -37,10 +37,11 @@ RUN poetry config virtualenvs.create false \
 # ---- App ----
 COPY . .
 
-RUN adduser --disabled-password --gecos '' app \
+# Create necessary directories and set permissions BEFORE switching user
+RUN mkdir -p /app/logs /app/static /app/media \
+    && adduser --disabled-password --gecos '' app \
     && chown app:app -R /app \
-    && chmod +x /app/deployment/entrypoint.sh \
-    && mkdir -p /app/logs
+    && chmod +x /app/deployment/entrypoint.sh
 
 USER app
 

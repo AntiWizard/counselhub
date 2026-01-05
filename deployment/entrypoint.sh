@@ -2,10 +2,6 @@
 
 set -e
 
-# There are some times database is not ready yet!
-# We'll check if database is ready and we can connect to it
-# then the rest of the code run as well.
-
 echo "=== Detecting GIS libraries ==="
 
 # ---------- GDAL ----------
@@ -32,12 +28,15 @@ export GEOS_LIBRARY_PATH
 
 echo "GDAL_LIBRARY_PATH=$GDAL_LIBRARY_PATH"
 echo "GEOS_LIBRARY_PATH=$GEOS_LIBRARY_PATH"
-
-# ---------- Verify ----------
-[ -f "$GDAL_LIBRARY_PATH" ] || echo "⚠️ GDAL not found"
-[ -f "$GEOS_LIBRARY_PATH" ] || echo "⚠️ GEOS not found"
-
 echo "=============================="
+
+# Compile messages. build `django.po` file, it will ignore in the code base
+python manage.py compilemessages -l fa
+status=$?
+if [ $status -ne 0 ]; then
+  echo "Failed to compilemessages: $status"
+  exit $status
+fi
 
 echo "Waiting for postgres database..."
 echo DB_NAME: ${DB_NAME}
@@ -46,29 +45,15 @@ echo DB_PORT: ${DB_PORT}
 while ! nc -z ${DB_HOST} ${DB_PORT}; do sleep 1; done
 echo "Connected to postgres database."
 
-# database migrations will migrate as soon as database is ready
-# as a result the database structure is always matched with the recent changes!
 echo "Start migrate"
-
 python manage.py migrate --no-input
-status=$?
-if [ $status -ne 0 ]; then
-  echo "Failed to migrate database: $status"
-  exit $status
-fi
 
+echo "Ensuring static and media directories exist..."
+mkdir -p /app/static /app/media /app/logs
+chmod 755 /app/static /app/media /app/logs
 
-# This step can't apply in Dockerfile because we don't have access to our
-# environment data.
 echo "Start collectstatic"
-
 python manage.py collectstatic --no-input
-status=$?
-if [ $status -ne 0 ]; then
-  echo "Failed to collect staticfiles: $status"
-  exit $status
-fi
-
 echo "End collectstatic"
 
 echo "Creating superuser if not exists..."
@@ -77,15 +62,8 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-username = "admin"
-password = "admin"
-email = "admin@example.com"
-
-if not User.objects.filter(username=username).exists():
-    User.objects.create_superuser(
-        username=username,
-        password=password
-    )
+if not User.objects.filter(username="admin").exists():
+    User.objects.create_superuser(username="admin", password="admin")
     print("Superuser created")
 else:
     print("Superuser already exists")
