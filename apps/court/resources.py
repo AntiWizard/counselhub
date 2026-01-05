@@ -80,7 +80,6 @@ class JudicialGeometryResource(resources.ModelResource):
 
         return self.geometry_by_code.get(str(code))
 
-
     def before_save_instance(self, instance, row, **kwargs):
         instance.judicial_id = self.judicial_map[row["judicial_code"]]
 

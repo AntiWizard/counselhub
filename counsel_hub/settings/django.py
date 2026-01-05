@@ -1,4 +1,6 @@
 import os
+
+from decouple import config
 from django.conf import settings
 
 ROOT_URLCONF = f"{settings.PROJECT_NAME}.urls"
@@ -13,7 +15,7 @@ except Exception:
     raise Exception("GDAL_LIBRARY_PATH not found. Please set")
 
 
-SECRET_KEY = os.getenv(
+SECRET_KEY = config(
     "SECRET_KEY", "6$5dze9kjkhj&w=k@j5mrr4@cq*jhir0m__0-y8-(*=cuag6ci3cng&6"
 )
 
