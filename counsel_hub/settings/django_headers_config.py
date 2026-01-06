@@ -1,14 +1,18 @@
 from corsheaders.defaults import default_headers, default_methods
-from counsel_hub.settings.django import settings
+from decouple import config
+from django.conf import settings
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:8000",
-    "http://localhost:3000",
-]
+CORS_ALLOW_ALL_ORIGINS = config(
+    "CORS_ALLOW_ALL_ORIGINS", default=settings.DEBUG, cast=bool
+)
 
-CORS_ALLOW_ALL_ORIGINS = settings.DEBUG
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS",
+    default="",
+    cast=lambda v: [s.strip() for s in v.split(",") if s],
+)
 
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = config("CORS_ALLOW_CREDENTIALS", default=True, cast=bool)
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "x-client",
